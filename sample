@@ -1,0 +1,45 @@
+import re
+import pandas as pd
+
+# read the text file
+with open('/content/TX.txt', 'r') as file:
+    lines = file.readlines()
+
+# split the lines by the delimiter
+delimiter = '*******************************'
+people_data = []
+person_data = []
+for line in lines:
+    if delimiter in line:
+        people_data.append(person_data)
+        person_data = []
+    else:
+        person_data.append(line.strip())
+
+# define the regular expressions for extracting the fields
+id_pattern = r'^Id\s*---\s*(\S+)'
+quiz_id_pattern = r'^QuizId\s*---\s*(\S+)'
+score_pattern = r'^Score\s*---\s*(\S+)'
+
+# extract the data for each person
+people_info = []
+for person in people_data:
+    person_info = {}
+    for line in person:
+        id_match = re.search(id_pattern, line)
+        if id_match:
+            person_info['Id'] = id_match.group(1)
+        quiz_id_match = re.search(quiz_id_pattern, line)
+        if quiz_id_match:
+            person_info['QuizId'] = quiz_id_match.group(1)
+        score_match = re.search(score_pattern, line)
+        if score_match:
+            person_info['Score'] = score_match.group(1)
+    people_info.append(person_info)
+
+# create a Pandas DataFrame from the list of dictionaries
+df = pd.DataFrame(people_info)
+
+# write the DataFrame to an Excel file
+df.to_excel('output.xlsx', index=False)
+
